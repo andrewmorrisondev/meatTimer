@@ -2,10 +2,19 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { actionCreators } from '../../state'
 
+import cookData from '../../assets/cookData'
+
+// components
+import SteakList from '../SteakList/SteakList'
+
 // css
 import styles from './SteakInput.module.css'
 
 function SteakInput() {
+
+    const generateRandomKey = () => {
+        return `${Date.now()}-${Math.floor(Math.random() * 1000)}`
+    }
 
     const steakList = useSelector((state) => state.steak)
     const dispatch = useDispatch()
@@ -19,6 +28,7 @@ function SteakInput() {
     }
 
     const [steakDetails, setSteakDetails] = useState({
+        id: generateRandomKey(),
         name: '',
         doneness: 'rare',
         thickness: 0.75,
@@ -32,10 +42,38 @@ function SteakInput() {
         }))
     }
 
+    let cookTimes
+
+    const totalCookTime = (steak) => {
+        let d = steak.doneness
+        let t = steak.thickness
+        cookTimes = cookData[d][t]
+        let totalTime = cookTimes.reduce((a, c) => a + c)
+        return totalTime
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
-        addSteak(steakDetails)
-        console.log('New Steak Component:', steakDetails)
+
+        const computedCookTime = totalCookTime(steakDetails)
+
+        const updatedSteak = {
+            ...steakDetails,
+            totalTime: computedCookTime,
+            cookTimes: cookTimes,
+        }
+        
+        console.log(updatedSteak)
+        addSteak(updatedSteak)
+        
+        setSteakDetails({
+            id: generateRandomKey(),
+            name: '',
+            doneness: 'rare',
+            thickness: 0.75,
+            totalTime: computedCookTime,
+            cookTimes: cookTimes
+        })
     }
 
     const handleRemove = () => {
@@ -45,7 +83,7 @@ function SteakInput() {
     
     useEffect(() => {
         console.log('Updated Steak List:', steakList)
-      }, [steakList])
+    }, [steakList])
 
     return (
         <>
@@ -85,6 +123,7 @@ function SteakInput() {
                 </form>
                 <button onClick={() => handleRemove()}>Start Over</button>
             </div>
+            <SteakList />
         </>
     )
 }

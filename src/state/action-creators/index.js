@@ -3,9 +3,12 @@ export const addSteak = (steak) => {
     dispatch({
       type: 'add',
       payload: {
+        id: steak.id,
         name: steak.name,
         doneness: steak.doneness,
         thickness: steak.thickness,
+        totalTime: steak.totalTime,
+        cookTimes: steak.cookTimes,
       }
     })
   }
