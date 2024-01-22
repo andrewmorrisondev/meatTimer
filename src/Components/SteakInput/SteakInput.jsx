@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { actionCreators } from '../../state'
 
 // css
@@ -11,36 +10,42 @@ function SteakInput() {
     const steakList = useSelector((state) => state.steak)
     const dispatch = useDispatch()
 
-    // const { addSteak } = bindActionCreators(actionCreators, dispatch)
-
     const addSteak = (steak) => {
         dispatch(actionCreators.addSteak(steak))
-      }
+    }
+
+    const removeSteaks = () => {
+        dispatch(actionCreators.resetSteak())
+    }
 
     const [steakDetails, setSteakDetails] = useState({
         name: '',
         doneness: 'rare',
         thickness: 0.75,
-      });
+    })
     
-      const handleInputChange = (evt) => {
-        const { name, value } = evt.target;
+    const handleInputChange = (evt) => {
+        const { name, value } = evt.target
         setSteakDetails((prevDetails) => ({
-          ...prevDetails,
-          [name]: value,
+            ...prevDetails,
+            [name]: value,
         }))
-      }
+    }
 
-      const handleSubmit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault()
-        // Create new Steak component
         addSteak(steakDetails)
         console.log('New Steak Component:', steakDetails)
+    }
+
+    const handleRemove = () => {
+        removeSteaks()
+        console.log('Steaks Deleted')
     }
     
     useEffect(() => {
         console.log('Updated Steak List:', steakList)
-      }, [steakList]);
+      }, [steakList])
 
     return (
         <>
@@ -78,6 +83,7 @@ function SteakInput() {
                     </select>
                     <input type="submit" />
                 </form>
+                <button onClick={() => handleRemove()}>Start Over</button>
             </div>
         </>
     )

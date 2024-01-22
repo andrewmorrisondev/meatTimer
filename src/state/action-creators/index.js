@@ -10,3 +10,11 @@ export const addSteak = (steak) => {
     })
   }
 }
+
+export const resetSteak = () => {
+  return (dispatch) => {
+    dispatch({
+      type: 'reset',
+    })
+  }
+}
