@@ -18,8 +18,8 @@ const Timer = ({ steak }) => {
       }
     })
 
-    return longestCookTime;
-  };
+    return longestCookTime
+  }
 
   // useEffect for Longest Cook Time Calculation:
   useEffect(() => {
