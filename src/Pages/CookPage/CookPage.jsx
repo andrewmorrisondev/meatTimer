@@ -16,7 +16,7 @@ const CookPage = () => {
     <>
       <div className={styles.container}>
         <div className={styles.steakList}>
-          <SteakList />
+          <SteakList page={'cook'}/>
         </div>
       </div>
       <div 

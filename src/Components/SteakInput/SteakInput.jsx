@@ -63,7 +63,6 @@ function SteakInput() {
             cookTimes: cookTimes,
         }
         
-        console.log(updatedSteak)
         addSteak(updatedSteak)
         
         setSteakDetails({
@@ -82,7 +81,7 @@ function SteakInput() {
     }
     
     useEffect(() => {
-        console.log('Updated Steak List:', steakList)
+        // updates store
     }, [steakList])
 
     return (
@@ -123,7 +122,7 @@ function SteakInput() {
                 </form>
                 <button onClick={() => handleRemove()}>Start Over</button>
             </div>
-            <SteakList />
+            <SteakList page={'input'}/>
         </>
     )
 }
