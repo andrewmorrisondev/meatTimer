@@ -1,14 +1,4 @@
 .steaks {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-content: flex-start;
   border: 2px solid black;
-  height: 70vh;
-  overflow: auto;
-}
-
-.begin {
-  border: 2px solid black;
-  width: 100%;
+  min-height: 400px;
 }
