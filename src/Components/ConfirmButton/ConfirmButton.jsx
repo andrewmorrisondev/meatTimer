@@ -1,17 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 // css
-import styles from './BeginButton.module.css'
+import styles from './ConfirmButton.module.css'
 
-const BeginButton = () => {
+const ConfirmButton = () => {
   const navigate = useNavigate()
-
-  const beginTimer = () => {
-    console.log('Timer has Started!')
-  }
 
   const handleClick = () => {
     navigate('/countdown')
-    beginTimer()
   }
 
   return (
@@ -20,10 +15,10 @@ const BeginButton = () => {
         className={styles.container}
         onClick={() => handleClick()}
       >
-        <h1>Begin Button</h1>
+        <h1>Confirm Setup</h1>
       </div>
     </>
   )
 }
 
-export default BeginButton
+export default ConfirmButton

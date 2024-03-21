@@ -1,83 +1,52 @@
-import React, { useState, useEffect } from 'react'
+// imports
+import React, { useState, useEffect, useMemo } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
+// store
+import { actionCreators } from '../../state'
+
+// css
 import styles from './Timer.module.css'
-import { useSelector } from 'react-redux'
 
-const Timer = ({ steak }) => {
-  const [preFlipTimeRemaining, setPreFlipTimeRemaining] = useState(0)
-  const [postFlipTimeRemaining, setPostFlipTimeRemaining] = useState(0)
-  const [waitTimeRemaining, setWaitTimeRemaining] = useState(0)
-
+const Timer = ({ steak, timersActive }) => {
   const steakData = useSelector((state) => state.steak)
+  const dispatch = useDispatch()
 
   const findLongestCookTime = () => {
     let longestCookTime = 0
-
     steakData.forEach((s) => {
       if (s.totalTime > longestCookTime) {
         longestCookTime = s.totalTime
       }
     })
-
     return longestCookTime
   }
 
-  // useEffect for Longest Cook Time Calculation:
-  useEffect(() => {
-    const longestCookTime = findLongestCookTime()
+  const longestCookTime = useMemo(findLongestCookTime, [steakData])
 
-    // Set wait time if the steak doesn't have the longest cook time
-    if (steak.totalTime < longestCookTime) {
-      const waitTimeSeconds = (longestCookTime - steak.totalTime) * 60
-      setWaitTimeRemaining(waitTimeSeconds)
+  useEffect(() => {
+    dispatch(actionCreators.setWaitTime({id: 0, waitTime: 0}))
+    // This effect is meant to run only once when the component mounts
+  }, [dispatch])
+
+  // UseEffect hooks for different timer phases
+  // Adjust these according to your logic for starting different timers
+  useEffect(() => {
+    // Initialization logic for wait, pre-flip, post-flip timers
+    // For example:
+    if (!timersActive) {
+      // Initialize or reset timers here
     }
-  }, [steak, steakData])
+  }, [timersActive, dispatch, steak.id, longestCookTime])
 
-  // useEffect for Wait Timer Countdown:
   useEffect(() => {
-    // Update the countdown every second for wait timer
-    const waitTimerInterval = setInterval(() => {
-      setWaitTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0))
-    }, 1000)
-
-    // Clean up wait timer interval on component unmount or when wait timer is up
-    return () => clearInterval(waitTimerInterval)
-  }, [])
-
-  // useEffect for Pre-Flip Timer Initialization:
-  useEffect(() => {
-    // If there is no wait timer, start the pre-flip timer immediately
-    if (waitTimeRemaining === 0) {
-      setPreFlipTimeRemaining(steak.cookTimes[0] * 60)
+    if (steak.totalTime === longestCookTime) dispatch(actionCreators.setPhase({id: steak.id, phase: 'side-a'}))
+    if (timersActive) {
+      if (steakData.waitTimeRemaining === 0) dispatch(actionCreators.setPhase({id: steak.id, phase: 'side-a'}))
+      if (steakData.preFlipTimeRemaining === 0) dispatch(actionCreators.setPhase({id: steak.id, phase: 'side-b'}))
+      if (steakData.postFlipTimeRemaining === 0) dispatch(actionCreators.setPhase({id: steak.id, phase: 'complete'}))
     }
-  }, [waitTimeRemaining, steak])
-
-  // useEffect for Post-Flip Timer Initialization:
-  useEffect(() => {
-    // Start the post-flip timer when pre-flip timer is finished
-    if (preFlipTimeRemaining === 0) {
-      setPostFlipTimeRemaining(steak.cookTimes[1] * 60)
-      const postFlipTimerInterval = setInterval(() => {
-        setPostFlipTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0))
-      }, 1000)
-
-      // Clean up post-flip timer interval on component unmount
-      return () => clearInterval(postFlipTimerInterval)
-    }
-  }, [preFlipTimeRemaining, steak])
-
-  // useEffect for Pre-Flip Timer Countdown:
-  useEffect(() => {
-    // Start the pre-flip timer when wait timer is finished
-    if (waitTimeRemaining === 0) {
-      const preFlipTimerInterval = setInterval(() => {
-        setPreFlipTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0))
-      }, 1000)
-
-      // Clean up pre-flip timer interval on component unmount
-      return () => clearInterval(preFlipTimerInterval)
-    }
-  }, [waitTimeRemaining])
-
+  }, [dispatch, steak.id, steak.totalTime, steakData, timersActive, longestCookTime])
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60)
@@ -88,17 +57,23 @@ const Timer = ({ steak }) => {
   // render
   return (
     <div className={styles.timer}>
-      {waitTimeRemaining > 0 && (
+      {steak.phase === 'waiting' && (
         <div>
-          Wait Timer: {formatTime(waitTimeRemaining)}
-          <br />
+          Wait: {formatTime(steakData.waitTimeRemaining)}
         </div>
       )}
-      Pre-Flip Timer: {formatTime(preFlipTimeRemaining)}
-      <br />
-      Post-Flip Timer: {formatTime(postFlipTimeRemaining)}
+      {steak.phase === 'side-a' && (
+        <div>
+          Cook First Side: {formatTime(steakData.preFlipTimeRemaining)}
+        </div>
+      )}
+      {steak.phase === 'side-b' && (
+        <div>
+          Cook Second Side: {formatTime(steakData.postFlipTimeRemaining)}
+        </div>
+      )}
     </div>
-  );
-};
+  )
+}
 
 export default Timer

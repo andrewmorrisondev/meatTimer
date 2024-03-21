@@ -4,7 +4,7 @@ import Timer from '../Timer/Timer'
 // css
 import styles from './Steak.module.css'
 
-const Steak = ({ steak, page }) => {
+const Steak = ({ steak, page, timersActive }) => {
 
   return (
     <>
@@ -12,14 +12,15 @@ const Steak = ({ steak, page }) => {
         // CookPage
         <div key={steak.id} className={styles.steak}>
           <h1>{steak.name}</h1>
-          <h2>{steak.totalTime}</h2>
-          <Timer steak={steak}/>
+          <Timer 
+            steak={steak}
+            timersActive={timersActive}
+          />
         </div>
       ) : (
         // Input Page
         <div key={steak.id} className={styles.steak}>
           <h1>{steak.name}</h1>
-          <h2>{steak.totalTime}</h2>
         </div>
       )}
     </>
